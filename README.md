@@ -4,7 +4,7 @@
 
 <p align="center">
   <a href="https://youtu.be/z22BuOb1igY">
-  <img src="https://raw.githubusercontent.com/MohitLamba94/Restoring-Extremely-Dark-Images-In-Real-Time/main/imgs/youtube_cvpr.jpeg" alt="Click to watch Demo Video" height="280">
+  <img src="https://raw.githubusercontent.com/MohitLamba94/Restoring-Extremely-Dark-Images-In-Real-Time/main/imgs/youtube_cvpr.jpeg" alt="Click to watch Demo Video" height="380">
   </a>
 </p>
 
