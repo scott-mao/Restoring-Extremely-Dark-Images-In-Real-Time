@@ -22,6 +22,9 @@ A practical low-light enhancement solution must be **computationally fast**, **m
 The code was tested on `Ubuntu 16.04 LTS` with `PyTorch 1.4`. Apart from commonly used libraries you need to install [rawpy](https://pypi.org/project/rawpy/).
 ## Quick Demo
 
+## License
+Copyright © Mohit Lamba, 2021. Patent Pending. All rights reserved. Please see the [license file](https://github.com/MohitLamba94/Restoring-Extremely-Dark-Images-In-Real-Time/blob/main/LICENSE) for terms.
+
 We are in process of getting all the prior permissions and copyrights from agencies that supported this work and this should complete soon. Latest by July 2021 the code will be made public and paper put up on arxiv. 
 
 UPDATED April 2021.
