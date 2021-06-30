@@ -10,7 +10,6 @@
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/MohitLamba94/Restoring-Extremely-Dark-Images-In-Real-Time/main/imgs/comparison.png" height="380">
-  </a>
 </p>
 
 
