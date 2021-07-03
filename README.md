@@ -39,10 +39,11 @@ Image No.: 3, Amplification_m=1: 45.878238677978516
 
 Files loaded to CPU RAM......
 
-
- Network parameters : 784768
+Network parameters : 784768
 
 Device on GPU: False
+
+Restored images saved in DEMO_RESTORED_IMAGES directory
 ```
 
 
