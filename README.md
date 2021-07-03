@@ -28,6 +28,9 @@ git clone https://github.com/MohitLamba94/Restoring-Extremely-Dark-Images-In-Rea
 cd Restoring-Extremely-Dark-Images-In-Real-Time
 python demo.py
 ```
+The above code will read extreme low-light images present in `demo_imgs`, create `demo_restored_images` directory and save the restored images for different estimated amplification factor in this directory.
+
+
 We are in process of getting all the prior permissions and copyrights from agencies that supported this work and this should complete soon. We will shortly add full training and testing codes. 
 
 ## Cite Us
