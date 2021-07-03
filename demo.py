@@ -28,3 +28,4 @@ checkpoint = torch.load('demo_imgs/weights', map_location=device)
 model.load_state_dict(checkpoint['model'])
 
 run_test(model, dataloader_test, save_images)
+print('Restored images saved in DEMO_RESTORED_IMAGES directory')
