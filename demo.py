@@ -7,7 +7,10 @@ import glob
 from common_classes import load_data, run_test
 from network import Net
 
-device = torch.device("cpu")
+if torch.cuda.is_available():
+    device = torch.device("cuda")
+else:
+    device = torch.device("cpu")
 
 save_images = 'demo_restored_images'
 
