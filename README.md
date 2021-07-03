@@ -21,7 +21,14 @@ A practical low-light enhancement solution must be **computationally fast**, **m
 # How to Use the Code?
 The code was tested on `Ubuntu 16.04 LTS` with `PyTorch 1.4`. Apart from commonly used libraries you need to install [rawpy](https://pypi.org/project/rawpy/) `pip install rawpy`.
 ## Quick Demo
-We are in process of getting all the prior permissions and copyrights from agencies that supported this work and this should complete soon. Latest by July 2021 the code will be made public and paper put up on arxiv. 
+
+```
+pip install rawpy
+git clone https://github.com/MohitLamba94/Restoring-Extremely-Dark-Images-In-Real-Time.git
+cd Restoring-Extremely-Dark-Images-In-Real-Time
+python demo.py
+```
+We are in process of getting all the prior permissions and copyrights from agencies that supported this work and this should complete soon. We will shortly add full training and testing codes. 
 
 ## Cite Us
 
