@@ -27,4 +27,4 @@ print('Device on GPU: {}'.format(next(model.parameters()).is_cuda))
 checkpoint = torch.load('demo_imgs/weights', map_location=device)
 model.load_state_dict(checkpoint['model'])
 
-run_test(model, dataloader_test, save_images, device)
+run_test(model, dataloader_test, save_images)
