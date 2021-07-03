@@ -24,7 +24,7 @@ model = Net()
 print('\n Network parameters : {}\n'.format(sum(p.numel() for p in model.parameters() if p.requires_grad)))
 model = model.to(device)
 print('Device on GPU: {}'.format(next(model.parameters()).is_cuda))
-checkpoint = torch.load('demo_imgs/weights', map_location=torch.device('cpu'))
+checkpoint = torch.load('demo_imgs/weights', map_location=device)
 model.load_state_dict(checkpoint['model'])
 
 run_test(model, dataloader_test, save_images)
