@@ -1,7 +1,5 @@
 opt={'base_lr':1e-4}
-
-
-opt['batch_size'] = 1
+opt['batch_size'] = #Enter batch size
 opt['atWhichSave'] = [2,100002,150002,200002,250002,300002,350002,400002,450002,500002,550000, 600000,650002,700002,750000,800000,850002,900002,950000,1000000]
 opt['iterations'] = 1000005
 dry_run_iterations = 100
