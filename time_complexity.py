@@ -2,6 +2,7 @@ from network import Net
 from ptflops import get_model_complexity_info
 import torch
 import torch.nn as nn
+import time
 
 class SID(nn.Module):
     def __init__(self):
@@ -111,3 +112,21 @@ print('{:<30}  {:<8}'.format('Computational complexity of Our model for a 8MP im
 macs, params = get_model_complexity_info(model_sid, (1, H,W), as_strings=True,
                                        print_per_layer_stat=False, verbose=False)
 print('{:<30}  {:<8}'.format('Computational complexity of SID model for a 8MP image: ', macs))
+
+tensor = torch.rand(1,1,H,W)
+with torch.no_grad():
+    model_ours.eval()
+    model_sid.eval()
+    print('Beginning Warmup...')
+    model_ours(tensor) # warmup
+    model_sid(tensor) # warmup
+    
+    beg=time.time()
+    for i in range(5):
+        model_ours(tensor)
+    print('Time taken by our model on CPU for 8MP image : {} seconds'.format((time.time()-beg)/5))
+
+    beg=time.time()
+    for i in range(5):
+        model_sid(tensor)
+    print('Time taken by SID model on CPU for 8MP image : {} seconds'.format((time.time()-beg)/5))
