@@ -1,5 +1,10 @@
 '''
-Since our initial experiments last year and for patenting we have slightly improved the network. Like instead of ranging 'm' from 0.1 to 0.9 it now ranges from 1 to 9. We also found that modern CUDA libraries have been specially designed for 3x3 kernels and by design larger kernels will be slower. Thus we additionally discourage use of large kernels. Further 'Learning Raw Image Denoising with Bayer Pattern Unification and Bayer Preserving Augmentation' suggests special data augmentations for Bayer pattern. We could not incorporate them so far but encourage the readers to try out data augmentations mentioned in this paper and see if it helps 
+Since our initial experiments last year and for patenting we have slightly improved the network. Like instead of ranging 'm' 
+from 0.1 to 0.9 it now ranges from 1 to 9. We also found that modern CUDA libraries have been specially designed for 3x3 kernels 
+and by design larger kernels will be slower. Thus we additionally discourage use of large kernels. Further 
+'Learning Raw Image Denoising with Bayer Pattern Unification and Bayer Preserving Augmentation' suggests special data 
+augmentations for Bayer pattern. We could not incorporate them so far but encourage the readers to try out data augmentations 
+mentioned in this paper and see if it helps.
 '''
 
 opt={'base_lr':1e-4} # Initial learning rate
