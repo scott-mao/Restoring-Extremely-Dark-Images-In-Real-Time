@@ -53,7 +53,6 @@ Restored images saved in DEMO_RESTORED_IMAGES directory
 
 ```
 pip install ptflops
-pip install rawpy
 git clone https://github.com/MohitLamba94/Restoring-Extremely-Dark-Images-In-Real-Time.git
 cd cd Restoring-Extremely-Dark-Images-In-Real-Time
 python time_complexity.py
