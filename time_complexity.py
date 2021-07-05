@@ -1,142 +1,113 @@
+from network import Net
+from ptflops import get_model_complexity_info
 import torch
 import torch.nn as nn
 
-
-def conv_layer(inc, outc, kernel_size=3, groups=1, bias=False, negative_slope=0.2, bn=False, init_type='kaiming', fan_type='fan_in', activation=False, pixelshuffle_init=False, upscale=4, num_classes=3, weight_normalization = True):
-
-    layers = []
-    if activation=='before':
-        layers.append(nn.ReLU(inplace=False))
-    layers.append(nn.Conv2d(in_channels=inc, out_channels=outc, kernel_size=kernel_size, padding = (kernel_size-1)//2, groups=groups, bias=bias, stride=1))
-    if activation=='after':
-        layers.append(nn.ReLU(inplace=False))
-            
-    return nn.Sequential(*layers)
-    
-    
-class ResBlock(nn.Module):    
-    def __init__(self,in_c):
-        super(ResBlock, self).__init__()
-                
-        self.conv1 = conv_layer(in_c, in_c, kernel_size=3, groups=1, bias=True, negative_slope=0.2, bn=False, init_type='kaiming', fan_type='fan_in', activation='after', pixelshuffle_init=False, upscale=False, num_classes=False, weight_normalization = True)
-        
-        self.conv2 = conv_layer(in_c, in_c, kernel_size=3, groups=1, bias=True, negative_slope=1, bn=False, init_type='kaiming', fan_type='fan_in', activation=False, pixelshuffle_init=False, upscale=False, num_classes=False, weight_normalization = True)
-
-    def forward(self, x):
-        return self.conv2(self.conv1(x)) + x
-        
-        
-class make_dense(nn.Module):
-    
-    def __init__(self, nChannels=64, growthRate=32, pos=False):
-        super(make_dense, self).__init__()
-        
-        kernel_size=3
-        if pos=='first':
-            self.conv = conv_layer(nChannels, growthRate, kernel_size=kernel_size, groups=1, bias=False, negative_slope=0.2, bn=False, init_type='kaiming', fan_type='fan_in', activation=False, pixelshuffle_init=False, upscale=False, num_classes=False, weight_normalization = True)
-        elif pos=='middle':
-            self.conv = conv_layer(nChannels, growthRate, kernel_size=kernel_size, groups=1, bias=False, negative_slope=0.2, bn=False, init_type='kaiming', fan_type='fan_in', activation='before', pixelshuffle_init=False, upscale=False, num_classes=False, weight_normalization = True)
-        elif pos=='last':
-            self.conv = conv_layer(nChannels, growthRate, kernel_size=kernel_size, groups=1, bias=False, negative_slope=1, bn=False, init_type='kaiming', fan_type='fan_in', activation='before', pixelshuffle_init=False, upscale=False, num_classes=False, weight_normalization = True)
-        else:
-            raise NotImplementedError('ReLU position error in make_dense')
-        
-    def forward(self, x):
-        return torch.cat((x, self.conv(x)), 1)
-        
-        
-        
-class RDB(nn.Module):
-    def __init__(self, nChannels=96, nDenselayer=5, growthRate=32):
-        super(RDB, self).__init__()
-        nChannels_ = nChannels
-        modules = []
-        
-        modules.append(make_dense(nChannels_, growthRate, 'first'))
-        nChannels_ += growthRate
-        for i in range(nDenselayer-2):    
-            modules.append(make_dense(nChannels_, growthRate, 'middle'))
-            nChannels_ += growthRate 
-        modules.append(make_dense(nChannels_, growthRate, 'last'))
-        nChannels_ += growthRate
-        
-        self.dense_layers = nn.Sequential(*modules)
-            
-        self.conv_1x1 = conv_layer(nChannels_, nChannels, kernel_size=1, groups=1, bias=False, negative_slope=1, bn=False, init_type='kaiming', fan_type='fan_in', activation=False, pixelshuffle_init=False, upscale=False, num_classes=False, weight_normalization = True)
-    
-    def forward(self, x):
-        return self.conv_1x1(self.dense_layers(x)) + x
-        
-        
-class Net(nn.Module):
-    
+class SID(nn.Module):
     def __init__(self):
-        super(Net, self).__init__()
+        super(SID, self).__init__()
         
-        
-        self.up4 = nn.PixelShuffle(4)
         self.up2 = nn.PixelShuffle(2)
+        self.lrelu = nn.LeakyReLU(0.2, inplace=False)
+        self.conv1_1 = nn.Conv2d(4, 32, kernel_size=3, stride=1, padding=1)
+        self.conv1_2 = nn.Conv2d(32, 32, kernel_size=3, stride=1, padding=1)
+        self.pool1 = nn.MaxPool2d(kernel_size=2)
         
-        self.conv32x = nn.Sequential(        
-                        conv_layer(1024, 128, kernel_size=3, groups=128, bias=True, negative_slope=1, bn=False, init_type='kaiming', fan_type='fan_in', activation=False, pixelshuffle_init=False, upscale=False, num_classes=False, weight_normalization = True),
-                        conv_layer(128, 64, kernel_size=3, groups=1, bias=True, negative_slope=1, bn=False, init_type='kaiming', fan_type='fan_in', activation=False, pixelshuffle_init=False, upscale=False, num_classes=False, weight_normalization = True)
-                        )
-                        
-        self.RDB1 = RDB(nChannels=64, nDenselayer=4, growthRate=32)
-        self.RDB2 = RDB(nChannels=64, nDenselayer=5, growthRate=32)
-        self.RDB3 = RDB(nChannels=64, nDenselayer=5, growthRate=32)
-
-        self.rdball = conv_layer(int(64*3), 64, kernel_size=1, groups=1, bias=False, negative_slope=1, bn=False, init_type='kaiming', fan_type='fan_in', activation=False, pixelshuffle_init=False, upscale=False, num_classes=False, weight_normalization = True)
+        self.conv2_1 = nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1)
+        self.conv2_2 = nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1)
+        self.pool2 = nn.MaxPool2d(kernel_size=2)
         
-        self.conv_rdb8x = conv_layer(int(64//16), 64, kernel_size=3, groups=1, bias=True, negative_slope=1, bn=False, init_type='kaiming', fan_type='fan_in', activation=False, pixelshuffle_init=False, upscale=False, num_classes=False, weight_normalization = True)
+        self.conv3_1 = nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1)
+        self.conv3_2 = nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=1)
+        self.pool3 = nn.MaxPool2d(kernel_size=2)
         
-        self.resblock8x = ResBlock(64)
+        self.conv4_1 = nn.Conv2d(128, 256, kernel_size=3, stride=1, padding=1)
+        self.conv4_2 = nn.Conv2d(256, 256, kernel_size=3, stride=1, padding=1)
+        self.pool4 = nn.MaxPool2d(kernel_size=2)
         
-        self.conv32_8_cat = nn.Sequential(
-                        conv_layer(128, 32, kernel_size=3, groups=4, bias=True, negative_slope=1, bn=False, init_type='kaiming', fan_type='fan_in', activation=False, pixelshuffle_init=False, upscale=False, num_classes=False, weight_normalization = True),
-                        conv_layer(32, 192, kernel_size=3, groups=1, bias=True, negative_slope=0.2, bn=False, init_type='kaiming', fan_type='fan_in', activation='after', pixelshuffle_init=False, upscale=False, num_classes=False, weight_normalization = True),
-                        self.up4)                      
+        self.conv5_1 = nn.Conv2d(256, 512, kernel_size=3, stride=1, padding=1)
+        self.conv5_2 = nn.Conv2d(512, 512, kernel_size=3, stride=1, padding=1)
         
+        self.upv6 = nn.ConvTranspose2d(512, 256, 2, stride=2)
+        self.conv6_1 = nn.Conv2d(512, 256, kernel_size=3, stride=1, padding=1)
+        self.conv6_2 = nn.Conv2d(256, 256, kernel_size=3, stride=1, padding=1)
         
-        self.conv2x = conv_layer(4, 12, kernel_size=5, groups=1, bias=True, negative_slope=1, bn=False, init_type='kaiming', fan_type='fan_in', activation=False, pixelshuffle_init=False, upscale=False, num_classes=False, weight_normalization = True)
+        self.upv7 = nn.ConvTranspose2d(256, 128, 2, stride=2)
+        self.conv7_1 = nn.Conv2d(256, 128, kernel_size=3, stride=1, padding=1)
+        self.conv7_2 = nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=1)
         
-        self.conv_2_8_32 = conv_layer(24, 12, kernel_size=5, groups=1, bias=True, negative_slope=1, bn=False, init_type='kaiming', fan_type='fan_in', activation=False, pixelshuffle_init=False, upscale=False, num_classes=False, weight_normalization = True)
+        self.upv8 = nn.ConvTranspose2d(128, 64, 2, stride=2)
+        self.conv8_1 = nn.Conv2d(128, 64, kernel_size=3, stride=1, padding=1)
+        self.conv8_2 = nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1)
         
+        self.upv9 = nn.ConvTranspose2d(64, 32, 2, stride=2)
+        self.conv9_1 = nn.Conv2d(64, 32, kernel_size=3, stride=1, padding=1)
+        self.conv9_2 = nn.Conv2d(32, 32, kernel_size=3, stride=1, padding=1)
         
+        self.conv10_1 = nn.Conv2d(32, 12, kernel_size=1, stride=1)
+    
+    def forward(self, x):
+        conv1 = self.lrelu(self.conv1_1(self.downshuffle(x,2)))
+        conv1 = self.lrelu(self.conv1_2(conv1))
+        pool1 = self.pool1(conv1)
+        
+        conv2 = self.lrelu(self.conv2_1(pool1))
+        conv2 = self.lrelu(self.conv2_2(conv2))
+        pool2 = self.pool1(conv2)
+        
+        conv3 = self.lrelu(self.conv3_1(pool2))
+        conv3 = self.lrelu(self.conv3_2(conv3))
+        pool3 = self.pool1(conv3)
+        
+        conv4 = self.lrelu(self.conv4_1(pool3))
+        conv4 = self.lrelu(self.conv4_2(conv4))
+        pool4 = self.pool1(conv4)
+        
+        conv5 = self.lrelu(self.conv5_1(pool4))
+        conv5 = self.lrelu(self.conv5_2(conv5))
+        
+        up6 = self.upv6(conv5)
+        up6 = torch.cat([up6, conv4], 1)
+        conv6 = self.lrelu(self.conv6_1(up6))
+        conv6 = self.lrelu(self.conv6_2(conv6))
+        
+        up7 = self.upv7(conv6)
+        up7 = torch.cat([up7, conv3], 1)
+        conv7 = self.lrelu(self.conv7_1(up7))
+        conv7 = self.lrelu(self.conv7_2(conv7))
+        
+        up8 = self.upv8(conv7)
+        up8 = torch.cat([up8, conv2], 1)
+        conv8 = self.lrelu(self.conv8_1(up8))
+        conv8 = self.lrelu(self.conv8_2(conv8))
+        
+        up9 = self.upv9(conv8)
+        up9 = torch.cat([up9, conv1], 1)
+        conv9 = self.lrelu(self.conv9_1(up9))
+        conv9 = self.lrelu(self.conv9_2(conv9))
+        
+        conv10= self.conv10_1(conv9)
+        out = self.up2(conv10)
+        return out
+    
     def downshuffle(self,var,r):
         b,c,h,w = var.size()
         out_channel = c*(r**2)
         out_h = h//r
         out_w = w//r
         return var.contiguous().view(b, c, out_h, r, out_w, r).permute(0,1,3,5,2,4).contiguous().view(b,out_channel, out_h, out_w).contiguous()
-        
-        
-    def forward(self,low):
-            
-        low2x = self.downshuffle(low,2)
-        
-        # 32x branch starts
-        low32x_beforeRDB = self.conv32x(self.downshuffle(low2x,16))
-        rdb1 = self.RDB1(low32x_beforeRDB)
-        rdb2 = self.RDB2(rdb1)
-        rdb3 = self.RDB3(rdb2)
-        rdb8x = torch.cat((rdb1,rdb2,rdb3),dim=1)
-        rdb8x = self.rdball(rdb8x)+low32x_beforeRDB
-        rdb8x = self.up4(rdb8x)
-        rdb8x = self.conv_rdb8x(rdb8x)
-        
-        # 8x branch starts
-        low8x = self.resblock8x(self.downshuffle(low2x,4))
-        cat_32_8 = torch.cat((low8x,rdb8x),dim=1).contiguous()
-        
-        b,c,h,w = cat_32_8.size()
-        G=2
-        cat_32_8 = cat_32_8.view(b, G, c // G, h, w).permute(0, 2, 1, 3, 4).contiguous().view(b, c, h, w)
-        cat_32_8 = self.conv32_8_cat(cat_32_8)
-        
-        
-        # 2x branch starts
-        low2x = torch.cat((self.conv2x(low2x),cat_32_8),dim=1)
-        low2x = self.up2(self.conv_2_8_32(low2x))
-        
-        return torch.clamp(low2x,min=0.0, max=1.0)
+
+
+model_ours = Net()
+model_sid = SID()
+print('\n---Our Model parameters : {}\n'.format(sum(p.numel() for p in model_ours.parameters() if p.requires_grad)))
+print('\n---SID model parameters : {}\n'.format(sum(p.numel() for p in model_sid.parameters() if p.requires_grad)))
+
+H = (2048//32)*32
+W = (4096//32)*32
+macs, params = get_model_complexity_info(model_ours, (1, H,W), as_strings=True,
+                                       print_per_layer_stat=False, verbose=False)
+print('{:<30}  {:<8}'.format('Computational complexity of Our model for a 8MP image: ', macs))
+macs, params = get_model_complexity_info(model_sid, (1, H,W), as_strings=True,
+                                       print_per_layer_stat=False, verbose=False)
+print('{:<30}  {:<8}'.format('Computational complexity of SID model for a 8MP image: ', macs))
