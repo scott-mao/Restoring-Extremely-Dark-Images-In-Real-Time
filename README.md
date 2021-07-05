@@ -71,7 +71,9 @@ Time taken by our model on CPU for 8MP image : 1.827214765548706 seconds
 Time taken by SID model on CPU for 8MP image : 9.998942331314088 seconds
 ```
 
-We are in process of getting all the prior permissions and copyrights from agencies that supported this work and this should complete soon. We will shortly add full training and testing codes. 
+### Training and Testing
+
+We will shortly add full training and testing codes. 
 
 ## Cite Us
 
