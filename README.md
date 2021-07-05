@@ -31,7 +31,7 @@ git clone https://github.com/MohitLamba94/Restoring-Extremely-Dark-Images-In-Rea
 cd Restoring-Extremely-Dark-Images-In-Real-Time
 python demo.py
 ```
-The above code will read extreme low-light images present in `demo_imgs`, create `demo_restored_images` directory and save the restored images for different estimated amplification factor in this directory. The expected output is as follows,
+The above code will read extreme low-light images present in `demo_imgs`, create `demo_restored_images` directory and save the restored images for different estimated amplification factor in this directory. The expected output in Google Colab is as follows,
 
 ```
 ...... Loading all files to CPU RAM
@@ -58,7 +58,7 @@ cd Restoring-Extremely-Dark-Images-In-Real-Time
 python time_complexity.py
 ```
 
-The expected output is,
+The expected output on google Colab is,
 
 ```
 ---Our Model parameters : 784768
