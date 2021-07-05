@@ -67,8 +67,8 @@ The expected output on google Colab is,
 Computational complexity of Our model:   41.38 GMac
 Computational complexity of SID model:   440.46 GMac
 Beginning Warmup...
-Time taken by our model on CPU for 8MP image : 2.127214765548706 seconds
-Time taken by SID model on CPU for 8MP image : 13.269942331314088 seconds
+Time taken by our model on CPU for 8MP image : 1.827214765548706 seconds
+Time taken by SID model on CPU for 8MP image : 9.998942331314088 seconds
 ```
 
 We are in process of getting all the prior permissions and copyrights from agencies that supported this work and this should complete soon. We will shortly add full training and testing codes. 
