@@ -1,7 +1,7 @@
 opt={'base_lr':1e-4}
 opt['reduce_lr_by'] = 0.1
 opt['atWhichReduce'] = [500000]
-opt['batch_size'] = 8
+opt['batch_size'] = #Enter batch size
 opt['atWhichSave'] = [2,100002,150002,200002,250002,300002,350002,400002,450002,500002,550000, 600000,650002,700002,750000,800000,850002,900002,950000,1000000]
 opt['iterations'] = 1000005
 dry_run_iterations = 100
@@ -60,25 +60,25 @@ os.makedirs(save_weights)
 os.makedirs(save_images)
 os.makedirs(save_csv_files)
 
-train_files = glob.glob('/media/data/mohit/chen_dark_cvpr_18_dataset/Sony/short/0*_00_0.1s.ARW')
-train_files +=glob.glob('/media/data/mohit/chen_dark_cvpr_18_dataset/Sony/short/2*_00_0.1s.ARW')
+train_files = glob.glob('/SID_cvpr_18_dataset/Sony/short/0*_00_0.1s.ARW')
+train_files +=glob.glob('/SID_cvpr_18_dataset/Sony/short/2*_00_0.1s.ARW')
 if dry_run:
     train_files = train_files[:2]
     opt['iterations'] = dry_run_iterations
     
 gt_files = []
 for x in train_files:
-    gt_files += glob.glob('/media/data/mohit/chen_dark_cvpr_18_dataset/Sony/long/*'+x[-17:-12]+'*.ARW')
+    gt_files += glob.glob('/SID_cvpr_18_dataset/Sony/long/*'+x[-17:-12]+'*.ARW')
     
 dataloader_train = DataLoader(load_data(train_files,gt_files,train_amplification_file,20,gt_amp=True,training=True), batch_size=opt['batch_size'], shuffle=True, num_workers=0, pin_memory=True)
 
-test_files = glob.glob('/media/data/mohit/chen_dark_cvpr_18_dataset/Sony/short/1*_00_0.1s.ARW') 
+test_files = glob.glob('/SID_cvpr_18_dataset/Sony/short/1*_00_0.1s.ARW') 
 if dry_run:
     test_files = test_files[:2]
     
 gt_files = []
 for x in test_files:
-    gt_files = gt_files+ glob.glob('/media/data/mohit/chen_dark_cvpr_18_dataset/Sony/long/*'+x[-17:-12]+'*.ARW')
+    gt_files = gt_files+ glob.glob('/SID_cvpr_18_dataset/Sony/long/*'+x[-17:-12]+'*.ARW')
 dataloader_test = DataLoader(load_data(test_files,gt_files,test_amplification_file,2,gt_amp=True,training=False), batch_size=1, shuffle=False, num_workers=0, pin_memory=True)
 
 for i,img in enumerate(dataloader_train):    
