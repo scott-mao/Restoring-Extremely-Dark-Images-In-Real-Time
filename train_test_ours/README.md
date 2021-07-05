@@ -3,4 +3,4 @@ The network was trained for 1 Million iterations on RAW images. As RAW images ar
 
 We used `train.py` to do training and testing. Please refer the detailed comments in this file for more information. Unlike demo files, we did not rigorously test this folder after uploading to GITHUB. Small changes may be required to execute it on your system.
 
-For your convenience we also provide files for training and testing related works. Please refer their original repositories to know more detials.
+For your convenience we also provide files for training and testing related works. These files are only for convenience and not a replacement to original repositories.
