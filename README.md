@@ -49,6 +49,25 @@ Device on GPU: False
 Restored images saved in DEMO_RESTORED_IMAGES directory
 ```
 
+### Measure Time-Memory Complexity
+
+```
+pip install ptflops
+pip install rawpy
+git clone https://github.com/MohitLamba94/Restoring-Extremely-Dark-Images-In-Real-Time.git
+cd cd Restoring-Extremely-Dark-Images-In-Real-Time
+python time_complexity.py
+```
+
+The expected output is,
+
+```
+---Our Model parameters : 784768
+---SID model parameters : 7760748
+
+Computational complexity of Our model:   41.38 GMac
+Computational complexity of SID model:   440.46 GMac
+```
 
 We are in process of getting all the prior permissions and copyrights from agencies that supported this work and this should complete soon. We will shortly add full training and testing codes. 
 
