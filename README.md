@@ -48,6 +48,7 @@ Device on GPU: False
 
 Restored images saved in DEMO_RESTORED_IMAGES directory
 ```
+The restored images should look like [this](https://github.com/MohitLamba94/Restoring-Extremely-Dark-Images-In-Real-Time/tree/main/demo_restored_images).
 
 ### Measure Time-Memory Complexity
 
