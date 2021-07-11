@@ -64,6 +64,8 @@ for x in train_files:
     gt_files += glob.glob('/SID_cvpr_18_dataset/Sony/long/*'+x[-17:-12]+'*.ARW')
     
 dataloader_train = DataLoader(load_data(train_files,gt_files,train_amplification_file,20,gt_amp=True,training=True), batch_size=opt['batch_size'], shuffle=True, num_workers=0, pin_memory=True)
+# gt_amp=True means use GT information for amplification. Make it false for automatic estimation.
+# 20 here means that afte every 20 images have been loaded to CPU RAM print statistics.
 
 test_files = glob.glob('/SID_cvpr_18_dataset/Sony/short/1*_00_0.1s.ARW') 
 if dry_run:
